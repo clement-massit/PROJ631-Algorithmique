@@ -50,8 +50,7 @@ def get_liste_horaires(name_arret):
 
 print(get_liste_horaires('Vernod'))
     
-
-
+def manip_heure
 
 
 

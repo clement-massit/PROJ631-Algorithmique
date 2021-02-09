@@ -7,8 +7,8 @@ Ceci est un script temporaire.
 
 #Enoncé : Gestion d'un réseau de bus
 
-from data2py import dates2dic
 
+from data import get_liste_horaires
 
 #=================================================
 #lignes de bus: 
@@ -32,9 +32,11 @@ class Arret:
     def get_label(self):
         return self.label
 
-    def time_bw_arret(self,heure):
-        
-
+    def next_depart(self,time_start):
+        horaires = self.get_liste_horaires()
+        horaire_next_depart = horaires[time_start + 1]
+        return horaire_next_depart
+print(('Vernod').next_depart('6:14'))
 
  
 class Bus:
