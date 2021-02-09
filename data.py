@@ -31,7 +31,7 @@ we_holidays_path = slited_content[3]
 we_holidays_date_go = dates2dic(slited_content[4])
 we_holidays_date_back = dates2dic(slited_content[5])
 
-print(regular_path)
+#print(regular_path)
 
 #print test arrets avec liste horaires
 arrets =[]
@@ -41,7 +41,19 @@ for cle,heure in regular_date_go.items():
 
 
 #méthode pour recuperer la liste des horaires d'un arret
-def get_liste_horaires(name):
-    return regular_date_go[name]    #on récupère la liste d'un arret donné
+def get_liste_horaires(name_arret):
+    reg_go = regular_date_go[name_arret]
+    reg_back = regular_date_back[name_arret]
+    hol_go = we_holidays_date_go[name_arret]
+    hol_back = we_holidays_date_back[name_arret]
+    return reg_go   #on récupère la liste d'un arret donné
 
-#print(get_liste_horaires('Vernod'))
+print(get_liste_horaires('Vernod'))
+    
+
+
+
+
+
+
+
