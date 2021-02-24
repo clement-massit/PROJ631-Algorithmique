@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 #-*-coding:utf-8-*-
+from arrets_sur_une_ligne_de_bus import get_next_step
 
 data_file_name = '1_Poisy-ParcDesGlaisins.txt'
 #data_file_name = '2_Piscine-Patinoire_Campus.txt'
@@ -41,6 +42,7 @@ for cle,heure in regular_date_go.items():
 
 
 #méthode pour recuperer la liste des horaires d'un arret
+# param : name_arret (str)
 def get_liste_horaires(name_arret):
     reg_go = regular_date_go[name_arret]
     reg_back = regular_date_back[name_arret]
@@ -48,11 +50,70 @@ def get_liste_horaires(name_arret):
     hol_back = we_holidays_date_back[name_arret]
     return reg_go   #on récupère la liste d'un arret donné
 
-print(get_liste_horaires('Vernod'))
+
+liste_horaire = get_liste_horaires('PARC_DES_GLAISINS')
+
+
+
+#cette fonction prend en parametre un str du type 'hh:mm'
+def manip_horaire(heure_numeric):
+    heure = []      #values des heure du dictionnaire
+    minutes = []    # values des minutes du dictionnaire
+    dict_horaire = {}
+    while '-' in heure_numeric:            #script pour remove tous les tirets
+        heure_numeric.remove('-')
     
-def manip_heure
+    separated = heure_numeric.split(':')
+    heure.append(separated[0])
+    minutes.append(separated[1])
+
+    dict_horaire['heure'] = heure
+    dict_horaire['minutes'] = minutes
+    return dict_horaire
+    #return un dictionnaire composé de 2 clés du type 'heure' : 6, 'minutes' : 36'
+   
+    
+
+#print('test manip horaire : ')
+#print(manip_horaire(liste_horaire[0]))      
+   
 
 
+
+
+#cette fonction renvoie l'horaire a laquelle on arrivera au prochain arret sur une ligne
+#elle prend en parametre une horaire de depart et un arret 
+#par exemple on est a Vernod il est 7:15 et on arriver a Meythet_Le_Rabelais a 7h21
+def get_next_horaire(timestart, arret):
+    #renvoie le ditcionnaire du timestart donné
+    horaire_dict = manip_horaire(timestart)
+    #renvoie le nom du prochain arret
+    next_step = get_next_step(arret,'1_Poisy-ParcDesGlaisins.txt')
+    liste_horaires = get_liste_horaires(next_step[0])  #on recupere la liste des horaires du prochain arret
+    
+    h,minutes = [], []
+    while '-' in liste_horaires:            
+        liste_horaires.remove('-')
+    horaires = {}
+    for i in range(len(liste_horaires)):
+        hora = liste_horaires[i].split(':')
+        h.append(hora[0]) 
+        minutes.append(hora[1])
+        
+        
+    horaires['heure'] = h
+    horaires['minutes'] = minutes
+    
+    
+    for i in range(len(liste_horaires)):
+        if horaire_dict['heure'][0] <= horaires['heure'][i] and horaire_dict['minutes'][0] <= horaires['minutes'][i] or horaire_dict['heure'][0] < horaires['heure'][i]:
+            next_h = horaires['heure'][i]
+            next_min = horaires['minutes'][i]
+            break
+    return [next_h,next_min]
+
+
+print('''Nous arriverons au prochain arret vers :''',get_next_horaire('7:20','Ponchy')[0], 'h', get_next_horaire('7:20','Ponchy')[1], 'min')
 
 
 

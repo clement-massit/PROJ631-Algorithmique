@@ -8,7 +8,7 @@ Ceci est un script temporaire.
 #Enoncé : Gestion d'un réseau de bus
 
 
-from data import get_liste_horaires
+#from data import get_liste_horaires
 
 #=================================================
 #lignes de bus: 
@@ -36,7 +36,7 @@ class Arret:
         horaires = self.get_liste_horaires()
         horaire_next_depart = horaires[time_start + 1]
         return horaire_next_depart
-print(('Vernod').next_depart('6:14'))
+    
 
  
 class Bus:
@@ -80,8 +80,10 @@ def get_path_holidays(lign):
     new_path = string_setup.split(' N ')    #split pour avoir la liste de tout les arret d'une ligne
     
     return new_path
-    
-print(get_path_holidays('1_Poisy-ParcDesGlaisins.txt'))    
+
+
+
+
 #=================================================
 
 
