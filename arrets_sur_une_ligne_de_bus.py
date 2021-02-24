@@ -44,17 +44,6 @@ def get_ligne_from_step_back(ligne,arret):
 #print(get_ligne_from_step_regular('1_Poisy-ParcDesGlaisins.txt', 'Vernod'))
 #========================================================            
 
-#on retourne le prochain arret a partir d'un arret donné
-#et depuis une ligne donné
-    
-def get_next_step(name_arret,ligne):
-    next_step = []
-    liste_arret = get_path_regular(ligne)
-    for ar in range(len(liste_arret)-1):
-        if liste_arret[ar] == name_arret:
-            next_step.append(liste_arret[ar + 1])
-    return next_step
-
 
 
 

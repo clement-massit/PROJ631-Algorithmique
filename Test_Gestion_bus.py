@@ -29,10 +29,10 @@ class Arret:
         self.liste_horaire_ligne
         
     
-    def get_label(self):
-        return self.label
+    def get_label(self):  #retourne le nom d'un arret
+        return self.label     
 
-    def next_depart(self,time_start):
+    def next_depart(self,time_start):   #retourne le prochain horaire de depart d'un bus sur le meme arret
         horaires = self.get_liste_horaires()
         horaire_next_depart = horaires[time_start + 1]
         return horaire_next_depart
@@ -80,8 +80,6 @@ def get_path_holidays(lign):
     new_path = string_setup.split(' N ')    #split pour avoir la liste de tout les arret d'une ligne
     
     return new_path
-
-
 
 
 #=================================================
