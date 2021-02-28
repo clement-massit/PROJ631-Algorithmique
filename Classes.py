@@ -10,6 +10,7 @@ Ceci est un script temporaire.
 
 #from data import get_liste_horaires
 import manip_data
+from manip_data import get_path_regular, get_path_holidays
 
 
 #=================================================
@@ -28,6 +29,7 @@ except OSError:
 class Arret:
     def __init__(self,label):
         self.label = label
+        
         #self.ligne_regular = manip_data.regular_path
         #self.ligne_holidays = manip_data.we_holidays_path
                 
@@ -70,11 +72,15 @@ VIGNIÈRES = Arret('VIGNIÈRES')
 Ponchy = Arret('Ponchy')
 PARC_DES_GLAISINS = Arret('PARC_DES_GLAISINS')    
 
+liste_arret = [LYCÉE_DE_POISY,POISY_COLLÈGE,Vernod,Meythet_Le_Rabelais,
+               Chorus,Mandallaz,GARE,France_Barattes,CES_Barattes,VIGNIÈRES,Ponchy,PARC_DES_GLAISINS]
+
+
+
 
     
 #==============================================================================
 #CLASSE LIGNE       
-from manip_data import get_path_regular, get_path_holidays
 
 class Ligne:
     def __init__(self, name_ligne):
@@ -107,6 +113,8 @@ class Ligne:
         end_path = path_back[index_start:index_end+1]
         
         return end_path
+    
+
 
 
 
@@ -126,45 +134,53 @@ def manip_horaire(time):
 
 def convert_to_hours_minutes(number):
     hours = number // 60
+  
     number -= (hours * 60)
     minutes = number 
-    return '{:02}:{:02}'.format(int(hours), int(minutes))
-
+    return '{:1}:{:02}'.format(int(hours), int(minutes))
 
 
 
 
 
 start = Vernod
-end = VIGNIÈRES
-timestart = '7:44'
-   
+end = GARE
+timestart = '7:00'
+
 chemin = ligne1.get_ligne_go_steps(start,end)
 print('chemin :', chemin)
 print('il est ', timestart)
 print('prochain bus qui part de ', start.get_label(),' est à ', start.next_depart(timestart))
+print()
 
 
-starthoraire = start.get_liste_horaires()
-print(starthoraire)
 
-
-horaire_next_depart = start.next_depart(timestart)
-print('horaire vernod next bus:', horaire_next_depart)
-
-
-print('on rentre dans la boucle')
-for h in range(len(starthoraire)):
+def get_index_horaire_du_next_arret(ar):    #objet arret
+    starthoraire = ar.get_liste_horaires()
+    #liste des horaires de l'arret
+    horaire_next_depart = ar.next_depart(timestart)
+    index_depart = starthoraire.index(horaire_next_depart)
+    #heure du prochain depart de l'arret
+    for h in range(len(starthoraire)):
     
-    if horaire_next_depart == starthoraire[h]:
-        print(horaire_next_depart, '==', starthoraire[h])
-        ind = h
-        break
+        if index_depart == starthoraire[h]:
+            break
+    return index_depart
+    
+print('index de lhoraire :',start.next_depart(timestart), 'est :', get_index_horaire_du_next_arret(start))
 
-    
-    
-    
+print()
 
+print('il est ', timestart, 'prochain bus à :',start.next_depart(timestart))
+
+for ar in chemin:
+    liste = Arret(ar).get_liste_horaires()
+    print('on est à ', ar)
+    print('départ du bus à :', liste[get_index_horaire_du_next_arret(start)])
+    
+    
+    
+#parcour liste de chemin prendre vernod +1 et getindexnextarret(vernod +1)
 
 
 
