@@ -281,9 +281,9 @@ def get_temps_du_trajet(start,end):
     #♦liste_horaires_arret = end.horaires_sec_path()
 
     time_debut = start.next_depart(real_time)
-    
-    time_fin = timestart
-    
+
+    time_fin = trajet(start,end,timestart)
+  
     
     minutes_debut = manip_horaire(time_debut)
     minutes_fin = manip_horaire(time_fin)
@@ -385,9 +385,21 @@ def sec_path():
 
 # ============================================================================
 #première partie
-start = construct_arret('Vernod')
-end = construct_arret('Ponchy')
+start = construct_arret('Parc_des_Sports')
+end = construct_arret('VIGNIÈRES')
 timestart = '7:21'
+
+'''
+print('Entrez un arret de départ :')
+start = construct_arret(input())
+print('Entrez un arret darriver :')
+end = construct_arret(input())
+
+print('Entrez un horaire de départ (de la forme HH:MM) :')
+timestart = input()
+'''
+
+
 real_time = timestart
 liste_arrets_first_path = first_path()
 liste_arrets_sec_path = sec_path()
@@ -399,32 +411,36 @@ print(liste_arrets_sec_path)
 print()
 
 
-
-#####   
 print('on part de ', start.get_label(), 'il est ', timestart)
 print('prochain bus à :', start.next_depart(timestart))
 print('------------------------------')
 
-for ar in liste_arrets_first_path:
-    
-    index_useful = get_index_horaire_du_next_arret(ar,timestart)
-    heure_first = Arret(ar).horaires_first_path()[index_useful]
-    print('on est a :', ar, '\nil est :', heure_first)
-    timestart = heure_first
-    
 
-print('----- switch de ligne -----')
-
-for ar in liste_arrets_sec_path:
+#####   
+def trajet(start,end,timestart):
+    for ar in liste_arrets_first_path:
+        
+        index_useful = get_index_horaire_du_next_arret(ar,timestart)
+        heure_first = Arret(ar).horaires_first_path()[index_useful]
+        print('on est a :', ar, '\nil est :', heure_first)
+        timestart = heure_first
+       
+        
     
-    print('on est a :', ar)
-    index_useful = get_index_horaire_du_next_arret_sec_path(ar,timestart)
-    heure_sec = Arret(ar).horaires_sec_path()[index_useful]
-    print('il est :', heure_sec)
-    timestart = heure_sec
+    #print('----- switch de ligne -----')
     
+    for ar in liste_arrets_sec_path:
+    
+        index_useful = get_index_horaire_du_next_arret_sec_path(ar,timestart)
+        heure_sec = Arret(ar).horaires_sec_path()[index_useful]
+        print('on est a :', ar, '\nil est :', heure_sec)
+        timestart = heure_sec
+        
+    last_time = timestart
+    
+    return last_time
 
-print('temps \t', get_temps_du_trajet(start,end), 'minutes')
+print(get_temps_du_trajet(start,end))     
     
 
 
