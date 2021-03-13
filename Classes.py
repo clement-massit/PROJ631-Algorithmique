@@ -411,29 +411,15 @@ def best_trajet(start,end):#fonction ok
 
 
 #CONSTRUCTION
-start = build_stop('Arcadium')
-end = build_stop('Ponchy')
-timestart = '6:24'
+
+start = build_stop('Parc_des_Sports')
+
+end = build_stop('CAMPUS')
+timestart = '16:32'
 real_time = timestart
 
 
-#print(best_trajet(start,end))
-'''
-print('Entrez un arret de départ :')
-start = construct_arret(input())
-print('Entrez un arret darriver :')
-end = construct_arret(input())
 
-print('Entrez un horaire de départ (de la forme HH:MM) :')
-timestart = input()
-
-
-print(start.get_ligne(), end.get_ligne())
-print(first_path())
-print()
-print(sec_path())
-print()
-'''
 
 
 plus_court = best_trajet(start,end)
@@ -442,7 +428,7 @@ for i in plus_court:
     print(i)
 print()    
 time_trajet_court = get_temps_du_trajet(plus_court,start,end)
-print('le temps de trajet est :', time_trajet_court, 'minutes')
+print('time travel :', time_trajet_court, 'minutes')
   
 
 print('\n------------------\n')
@@ -452,9 +438,6 @@ for i in plus_rapide:
     print(i)
 print()    
 time_trajet_rapide = get_temps_du_trajet(plus_rapide,start,end)
-print('le temps de trajet est :', time_trajet_rapide, 'minutes')
-print()   
-
-
-
+print('time travel :', time_trajet_rapide, 'minutes')
+print()  
 

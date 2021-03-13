@@ -6,14 +6,28 @@ Created on Sat Mar 13 20:23:01 2021
 """
 
 import Classes
-import tests
 
 
 
-start = Classes.build_stop('Arcadium')
-end = Classes.build_stop('Ponchy')
-timestart = '6:24'
-real_time = timestart
+
+'''start = Classes.build_stop('Arcadium')
+end = Classes.build_stop('Ponchy')'''
+
+
+def build_stop_and_timetable():
+    
+    print('Enter a start stop :')
+    start = Classes.build_stop(input())
+    print('Enter a final stop :')
+    end = Classes.build_stop(input())
+    
+    print('Enter a timetable (like HH:MM) :')
+    timestart = input()
+
+    return start,end,timestart
+
+
+#real_time = timestart
 
 
 
@@ -23,7 +37,7 @@ for i in plus_court:
     print(i)
 print()    
 time_trajet_court = Classes.get_temps_du_trajet(plus_court,start,end)
-print('le temps de trajet est :', time_trajet_court, 'minutes')
+print('time travel :', time_trajet_court, 'minutes')
   
 
 print('\n------------------\n')
@@ -33,5 +47,5 @@ for i in plus_rapide:
     print(i)
 print()    
 time_trajet_rapide = Classes.get_temps_du_trajet(plus_rapide,start,end)
-print('le temps de trajet est :', time_trajet_rapide, 'minutes')
+print('time travel :', time_trajet_rapide, 'minutes')
 print()   
