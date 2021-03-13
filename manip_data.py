@@ -3,18 +3,9 @@
 
 
 ligne1 = '1_Poisy-ParcDesGlaisins.txt'
-ligne2 = '2_Piscine-Patinoire_Campus.txt.txt'
-def regular_horaires(lign):
-    
-    try:
-        with open(lign, 'r', encoding = "utf-8") as f:
-            content = f.read()
-            
-    except OSError:
-        # 'File not found' error message.
-        print("File not found")
-    
-    def dates2dic(dates):
+ligne2 = '2_Piscine-Patinoire_Campus.txt'
+
+def dates2dic(dates):
         dic = {}
         splitted_dates = dates.split("\n")
         #print(splitted_dates)
@@ -23,13 +14,23 @@ def regular_horaires(lign):
             dic[tmp[0]] = tmp[1:]
         return dic
     
+    
+def regular_horaires(lign):
+    try:
+        with open(lign, 'r', encoding = "utf-8") as f:
+            content = f.read()
+            
+    except OSError:
+        # 'File not found' error message.
+        print("File not found")
+    
     slited_content = content.split("\n\n")
-    #les 2 premières parties du txt
     regular_path = slited_content[0]
     regular_date_go = dates2dic(slited_content[1])
     regular_date_back = dates2dic(slited_content[2])
     
     return regular_date_go
+
 
 
 
@@ -41,15 +42,6 @@ def holidays_horaires(lign):
     except OSError:
         # 'File not found' error message.
         print("File not found")
-    
-    def dates2dic(dates):
-        dic = {}
-        splitted_dates = dates.split("\n")
-        #print(splitted_dates)
-        for stop_dates in splitted_dates:
-            tmp = stop_dates.split(" ")
-            dic[tmp[0]] = tmp[1:]
-        return dic
     
     slited_content = content.split("\n\n")
     #les 2 dernières parties du txt

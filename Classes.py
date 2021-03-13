@@ -12,14 +12,6 @@ Ceci est un script temporaire.
 
 import manip_data
 
-
-#=================================================
-#lignes de bus: 
-#data_file_name = '1_Poisy-ParcDesGlaisins.txt'
-
-
-
-    
 #==============================================================================  
 #CLASSE ARRET    
 class Arret:
@@ -28,14 +20,23 @@ class Arret:
         
     def get_ligne(self):
         ligne = ''
-        for ar in manip_data.get_path_regular(ligne1.get_name_ligne()):
-            if self.get_label() == ar:
+        dico_l1 = manip_data.regular_horaires(ligne1.get_name_ligne())
+        dico_l2 = manip_data.regular_horaires(ligne2.get_name_ligne())
+        
+        for key in dico_l1.keys():
+            if self.get_label() not in dico_l2:
                 ligne = ligne1.get_name_ligne()
                 break
-        if self.get_label() not in manip_data.get_path_regular(ligne1.get_name_ligne()):
-            ligne = ligne2.get_name_ligne()
-            #ligne = ligne[0:-4] #pour enlever le .txt a la fin, c'est juste de l'habillage
-        #print('''l'arret ''', self.get_label(), 'fait partie de la ligne :')  
+            if self.get_label() not in dico_l1: 
+                ligne = ligne2.get_name_ligne()
+                break
+            else:   
+                if start.get_label() == key:
+                    ligne = ligne1.get_name_ligne()
+                    break
+                else:
+                    ligne = ligne2.get_name_ligne()
+                
         return ligne
 
         
@@ -59,6 +60,7 @@ class Arret:
                 horaire_compare = manip_horaire(m)
                 if horaire_compare > time:
                     break
+                
         return convert_to_hours_minutes(horaire_compare)
     
     
@@ -84,76 +86,51 @@ class Arret:
     # param : name_arret (str)
     
     def horaires_first_path(self):
-        '''try:
-            with open(start.get_ligne(), 'r', encoding = "utf-8") as f:
-                content = f.read()
-               
-        except OSError:
-            # 'File not found' error message.
-            print("File not found")'''
-            
-        dico = manip_data.regular_horaires(start.get_ligne())  #modifier peut etre le start pour avoir les 2 lignes
-        
-        for cle in dico.keys():        
-            if self.get_label() == cle:
-                horaires = dico[self.get_label()]
+        dico = manip_data.regular_horaires(self.get_ligne())  
+        horaires = dico[self.get_label()]
         
         return horaires
     
     
-    def horaires_sec_path(self):
-        '''try:
-            with open(start.get_ligne(), 'r', encoding = "utf-8") as f:
-                content = f.read()
-               
-        except OSError:
-            # 'File not found' error message.
-            print("File not found")'''
-            
-        dico = manip_data.regular_horaires(self.get_ligne())  #modifier peut etre le start pour avoir les 2 lignes
-        
-        for cle in dico.keys():        
-            if self.get_label() == cle:
-                horaires = dico[self.get_label()]
-        
-        return horaires
+    '''def horaires_sec_path(self):
+        dico = manip_data.regular_horaires(end.get_ligne())  
+        horaires = dico[self.get_label()]
     
+        
+        return horaires'''
+    
+    def get_index_horaire_du_next_arret(self,time):  
+        #liste des horaires de l'arret
+        liste_horaires_ar = self.horaires_first_path()
+        
+        horaire_next_depart = self.next_depart(time)  
+       
+        #heure du prochain bus a l'arret ar
+        index_depart = liste_horaires_ar.index(horaire_next_depart)
+    
+        for h in range(len(liste_horaires_ar)):
+        
+            if index_depart == liste_horaires_ar[h]:
+                break
+        return index_depart
+    
+    def get_index_horaire_du_next_arret_sec_path(self,time):  
+        #liste des horaires de l'arret
+        liste_horaires_ar = self.horaires_sec_path()
+        
+        horaire_next_depart = self.next_depart_sec_path(time) 
 
+        #heure du prochain bus a l'arret ar
+        index_depart = liste_horaires_ar.index(horaire_next_depart)
+    
+        for h in range(len(liste_horaires_ar)):
+        
+            if index_depart == liste_horaires_ar[h]:
+                break
+        return index_depart
 
 def construct_arret(ar):
     return Arret(ar)
-
-
-'''
-#ligne 1   
-LYCÉE_DE_POISY = Arret('LYCÉE_DE_POISY')
-POISY_COLLÈGE = Arret('POISY_COLLÈGE')
-Vernod = Arret('Vernod')
-Meythet_Le_Rabelais = Arret('Meythet_Le_Rabelais')
-Chorus = Arret('Chorus')
-Mandallaz = Arret('Mandallaz')
-GARE = Arret('GARE')
-France_Barattes = Arret('France_Barattes')
-CES_Barattes = Arret('C.E.S_Barattes')
-VIGNIÈRES = Arret('VIGNIÈRES')
-Ponchy = Arret('Ponchy')
-PARC_DES_GLAISINS = Arret('PARC_DES_GLAISINS')    
-
-
-PISCINE_PATINOIRE = Arret('PISCINE-PATINOIRE')
-Arcadium = Arret('Arcadium')
-Parc_des_Sports = Arret('Parc_des_Sports')  
-Place_des_Romains = Arret('Place_des_Romains')
-Courier = Arret('Courier')
-GARE = Arret('GARE')
-Bonlieu = Arret('Bonlieu')
-Préfecture_Pâquier = Arret('Préfecture_Pâquier')
-Impérial = Arret('Impérial')
-Pommaries = Arret('Pommaries')
-VIGNIÈRES = Arret('VIGNIÈRES')
-CAMPUS = Arret('CAMPUS') 
-'''
-
 
 
 #==============================================================================
@@ -171,15 +148,21 @@ class Ligne:
     
     #parametre : une ligne(str) et un arret(str)
     def get_ligne_go_steps(self,start,end):
-        path_go = manip_data.get_path_regular(self.name_ligne)
+        '''path_go = manip_data.get_path_regular(self.name_ligne)
         
         index_start = path_go.index(Arret.get_label(start))
         index_end = path_go.index(Arret.get_label(end))
         
         end_path = path_go.copy()
         end_path = path_go[index_start:index_end+1]
+        '''
+        
+        first = first_path()
+        last = sec_path()
+
+        total = first + last
     
-        return end_path
+        return total
         
     #parametre : une ligne(str) et un arret(str)
     def get_ligne_back_steps(self,start,end):
@@ -205,8 +188,6 @@ ligne1 = Ligne('1_Poisy-ParcDesGlaisins.txt')
 ligne2 = Ligne('2_Piscine-Patinoire_Campus.txt')
 
 
-
-
 #==============================================================================
 #HORAIRES
 from datetime import timedelta
@@ -230,165 +211,214 @@ def convert_to_hours_minutes(number):
     return '{:1}:{:02}'.format(int(hours), int(minutes))
 
 
-#==============================================================================
-#PHASE DE TEST
-'''
-print('Entrez un arret de départ :')
-start = construct_arret(input())
-print('Entrez un arret darriver :')
-end = construct_arret(input())
-
-print('Entrez un horaire de départ (de la forme HH:MM) :')
-timestart = input()
-
-'''
-
-def get_index_horaire_du_next_arret(ar,time):  
-    #liste des horaires de l'arret
-    liste_horaires_ar = Arret(ar).horaires_first_path()
-    horaire_next_depart = Arret(ar).next_depart(time)  
-
-    #heure du prochain bus a l'arret ar
-    index_depart = liste_horaires_ar.index(horaire_next_depart)
-
-    for h in range(len(liste_horaires_ar)):
+def get_last_time(liste,timestart):
+    for ar in liste:
+        
+        index_useful = Arret(ar).get_index_horaire_du_next_arret(timestart)
+        heure_first = Arret(ar).horaires_first_path()[index_useful]
+        timestart = heure_first
+    time_done = timestart
     
-        if index_depart == liste_horaires_ar[h]:
-            break
-    return index_depart
+    return time_done
 
-
-
-def get_index_horaire_du_next_arret_sec_path(ar,time):  
-    #liste des horaires de l'arret
-    liste_horaires_ar = Arret(ar).horaires_sec_path()
+def get_temps_du_trajet(liste,start,end):  
     
-    horaire_next_depart = Arret(ar).next_depart_sec_path(time) 
-    
-    
-    #heure du prochain bus a l'arret ar
-    index_depart = liste_horaires_ar.index(horaire_next_depart)
-
-    for h in range(len(liste_horaires_ar)):
-    
-        if index_depart == liste_horaires_ar[h]:
-            break
-    return index_depart
-
-
-
-def get_temps_du_trajet(start,end):  
-    #♦liste_horaires_arret = end.horaires_sec_path()
-
-    time_debut = start.next_depart(real_time)
-
-    time_fin = trajet(start,end,timestart)
+    #plus court
+    time_debut_c = start.next_depart(real_time)
+    time_fin_c = get_last_time(liste,timestart)
   
     
-    minutes_debut = manip_horaire(time_debut)
-    minutes_fin = manip_horaire(time_fin)
-    time_trajet = minutes_fin - minutes_debut
+    minutes_debut_c = manip_horaire(time_debut_c)
+    minutes_fin_c = manip_horaire(time_fin_c)
     
-    return round(time_trajet)
-
-
-#la fonction qu'on va séparé en deux
+    time_trajet_c = minutes_fin_c - minutes_debut_c
     
-
-
-
-'''
-def path_with_mixed_lignes(start,end):
-    #First part
-    first_ligne = manip_data.get_path_regular(start.get_ligne()) #liste 
+    '''#plus rapide
+    time_debut_r = start.next_depart(real_time)
+    time_fin_r = get_last_time(trajet_sur_une_ligne(start,end),timestart)
+  
     
-    index_start = first_ligne.index(start.get_label())    #index de start dans la liste d'arret
+    minutes_debut_r = manip_horaire(time_debut_r)
+    minutes_fin_r = manip_horaire(time_fin_r)
     
+    time_trajet_r = minutes_fin_r - minutes_debut_r'''
     
-    for ar in first_ligne:
-        
-        if ligne1.existe_dans_ligne(ar) == True and ligne2.existe_dans_ligne(ar) == True:
-            first_index = first_ligne.index(ar)
-            break
-        
-    first_path = first_ligne[index_start:first_index+1]
-    
-
-    #Second part
-    sec_ligne = manip_data.get_path_regular(end.get_ligne())
-    index_end = sec_ligne.index(end.get_label())
-    
-    for ar in first_ligne:
-        
-        if first_path[-1] == ar:
-            sec_index = sec_ligne.index(ar)
-           
-            
-    sec_path = sec_ligne[sec_index:index_end+1]  # 0 -- +1 ou +1 -- +1
-    
-    #print(first_path)
-    #print(sec_path)
-    
-    path = first_path + sec_path
-    #print(path)
-    return path
-'''
-
-print('--------------------')
+    return round(time_trajet_c)
 
 
 
-
-def first_path():  
-    try:
-        with open(start.get_ligne(), 'r', encoding = "utf-8") as f:
-            content = f.read()
-           
-    except OSError:
-        # 'File not found' error message.
-        print("File not found")
-        
-    dico = manip_data.regular_horaires(start.get_ligne())
-    ligne = []
-    for cle in dico.keys():
-        
-        ligne.append(cle)
-        
-    del ligne[0:ligne.index(start.get_label())]
-    for ar in ligne:
-    
-        if ligne1.existe_dans_ligne(ar) == True and ligne2.existe_dans_ligne(ar) == True:
-            del ligne[ligne.index(ar)+1 :]
-     
-    return ligne
-      
-
-
-
-def sec_path():  
-        
-    dico = manip_data.regular_horaires(end.get_ligne())
-    ligne = []
-    for cle in dico.keys():
-        
-        ligne.append(cle)
-        
-    liste_arrets = first_path()
-    del ligne[ligne.index(end.get_label())+1:]
-    for ar in ligne:
-        if liste_arrets[-1] == ar:
-            del ligne[0:ligne.index(liste_arrets[-1])+1]
-     
-    return ligne
-
+#==============================================================================
 
 
 # ============================================================================
-#première partie
-start = construct_arret('Parc_des_Sports')
-end = construct_arret('VIGNIÈRES')
-timestart = '7:21'
+#   CHEMIN LE PLUS RAPIDE
+    
+def trajet_sur_une_ligne(start,end):
+  
+    dico = manip_data.regular_horaires(start.get_ligne())
+    chemin = []
+    
+    for key in dico.keys():
+        chemin.append(key)
+         
+        if key == end.get_label():
+            break
+        
+    del chemin[0:chemin.index(start.get_label())]     
+    return chemin
 
+
+
+
+
+def possible_times(start,end):
+    trajet = trajet_sur_une_ligne(start,end)
+    other = first_path() + sec_path()
+    
+    time1 = get_temps_du_trajet(trajet,start,end)
+    time2 = get_temps_du_trajet(other,start,end)
+    
+    return time1,time2
+
+def get_trajet_rapide(time,start,end):
+    return trajet_sur_une_ligne(start,end) if time == possible_times(start,end)[0] else first_path() + sec_path()
+
+
+
+def best_time(start,end):
+    time1 = possible_times(start,end)[0]
+    time2 = possible_times(start,end)[1]
+    return time1 if time1 < time2 else time2
+
+
+print(best_time(start,end))
+#==============================================================================
+#   CHEMIN LE PLUS COURT
+def first_path():
+        
+    dico = manip_data.regular_horaires(start.get_ligne())
+    
+    chemin = []
+    
+    
+    for cle in dico.keys():
+        chemin.append(cle)
+        
+    del chemin[0:chemin.index(start.get_label())]
+  
+    for ar in chemin:  
+        if ar == end.get_label():
+            del chemin[chemin.index(ar)+1:]
+            return chemin 
+         
+        if ligne1.existe_dans_ligne(ar) == True and ligne2.existe_dans_ligne(ar) == True: 
+            del chemin[chemin.index(ar)+1:]        
+            return chemin 
+
+
+##changement de ligne
+def sec_path():  
+    if first_path()[-1] == end.get_label():
+        
+        return []
+ 
+    #1er switch 
+    ligne_at_start = start.get_ligne()
+   
+    if ligne_at_start == ligne1.get_name_ligne():
+        switch = ligne2.get_name_ligne()
+    else:
+        switch = ligne1.get_name_ligne()
+        
+   
+    dico = manip_data.regular_horaires(switch)
+    chemin = []
+    for cle in dico.keys():
+        chemin.append(cle)
+    liste_arret = first_path()
+    
+    index = chemin.index(liste_arret[-1])
+    
+    del chemin[0:index+1]
+    
+    for ar in chemin:
+        if ligne1.existe_dans_ligne(ar) == True and ligne2.existe_dans_ligne(ar) == True:
+            del chemin[chemin.index(ar)+1:]
+    if end.get_label() == chemin[-1]:
+        
+        return chemin
+    
+   
+    ##reswitch eventuellement
+    if end.get_label() != chemin[-1]:
+        if end.get_ligne() == Arret(chemin[-1]).get_ligne():
+            ligne_at_start = ligne_at_start
+            
+        else:
+            ligne_at_start = switch
+            
+            
+        new_dico = manip_data.regular_horaires(ligne_at_start)
+        
+        new_list = []
+        
+        
+        for key in new_dico.keys():
+            new_list.append(key)
+            
+            
+        
+        new_index = new_list.index(first_path()[-1])
+        fin_index = new_list.index(end.get_label()) 
+       
+        for ar in new_list:
+        
+            if ar == chemin[-1]:
+                #print('new_liste quon doit del',new_list,'\n')
+                #del new_list[0:new_index]
+                #print('\nee', new_list,'\n')
+                new_list = new_list[new_index:fin_index+1]
+                
+                
+        
+           
+        return new_list
+
+
+def possible_paths(sart,end):
+    trajet = trajet_sur_une_ligne(start,end)
+   
+    other = first_path() + sec_path()
+   
+    result = []
+    for ar in other:
+        if ar not in result:
+            result.append(ar)
+    
+    return trajet,result
+    
+    
+    
+def best_trajet(start,end):#fonction ok
+    paths = possible_paths(start,end)
+    
+    if len(paths[0]) < len(paths[1]):
+        return paths[0]
+    else:
+        return paths[1]
+
+   
+#==============================================================================   
+
+
+#CONSTRUCTION
+start = construct_arret('Arcadium')
+end = construct_arret('Ponchy')
+timestart = '6:24'
+real_time = timestart
+
+
+#print(best_trajet(start,end))
 '''
 print('Entrez un arret de départ :')
 start = construct_arret(input())
@@ -397,51 +427,36 @@ end = construct_arret(input())
 
 print('Entrez un horaire de départ (de la forme HH:MM) :')
 timestart = input()
+
+
+print(start.get_ligne(), end.get_ligne())
+print(first_path())
+print()
+print(sec_path())
+print()
 '''
 
+print('time start :', timestart)
 
-real_time = timestart
-liste_arrets_first_path = first_path()
-liste_arrets_sec_path = sec_path()
+plus_court = best_trajet(start,end)
+print('chemin le plus court :')
+for i in plus_court:
+    print(i)
+print()    
+time_trajet_court = get_temps_du_trajet(plus_court,start,end)
+print('le temps de trajet est :', time_trajet_court, 'minutes')
+  
 
-print(liste_arrets_first_path)
-print(liste_arrets_sec_path)
+print('\n------------------\n')
+plus_rapide = get_trajet_rapide(best_time(start,end), start,end)
+print('chemin le plus rapide')
+for i in plus_rapide:
+    print(i)
+print()    
+time_trajet_rapide = get_temps_du_trajet(plus_rapide,start,end)
+print('le temps de trajet est :', time_trajet_rapide, 'minutes')
+print()   
 
-    
-print()
-
-
-print('on part de ', start.get_label(), 'il est ', timestart)
-print('prochain bus à :', start.next_depart(timestart))
-print('------------------------------')
-
-
-#####   
-def trajet(start,end,timestart):
-    for ar in liste_arrets_first_path:
-        
-        index_useful = get_index_horaire_du_next_arret(ar,timestart)
-        heure_first = Arret(ar).horaires_first_path()[index_useful]
-        print('on est a :', ar, '\nil est :', heure_first)
-        timestart = heure_first
-       
-        
-    
-    #print('----- switch de ligne -----')
-    
-    for ar in liste_arrets_sec_path:
-    
-        index_useful = get_index_horaire_du_next_arret_sec_path(ar,timestart)
-        heure_sec = Arret(ar).horaires_sec_path()[index_useful]
-        print('on est a :', ar, '\nil est :', heure_sec)
-        timestart = heure_sec
-        
-    last_time = timestart
-    
-    return last_time
-
-print(get_temps_du_trajet(start,end))     
-    
 
 
 
