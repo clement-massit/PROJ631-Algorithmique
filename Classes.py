@@ -5,16 +5,15 @@
 Ceci est un script temporaire.
 """
 
-#Enoncé : Gestion d'un réseau de bus
-
-
-#from data import get_liste_horaires
 
 import manip_data
 
 #==============================================================================  
 #CLASSE ARRET    
 class Arret:
+    """
+    A stop possesses a label -> the name of the stop
+    """
     def __init__(self,label):
         self.label = label
         
@@ -44,7 +43,10 @@ class Arret:
         return self.label    
     
 
-    def next_depart(self,time_start):   #retourne le prochain horaire de depart d'un bus sur le meme arret
+    def next_depart(self,time_start):
+        #return the next timetable of the next stop
+        #from the first path (this is for the shortest way)
+        
         liste_horaire = self.horaires_first_path()
        
         time = manip_horaire(time_start)
@@ -64,7 +66,9 @@ class Arret:
         return convert_to_hours_minutes(horaire_compare)
     
     
-    def next_depart_sec_path(self,time_start):   #retourne le prochain horaire de depart d'un bus sur le meme arret
+    def next_depart_sec_path(self,time_start):
+        #return the next timetable of the next stop
+        #from the second path (this is for the shortest way)
         liste_horaire = self.horaires_sec_path()
        
         time = manip_horaire(time_start)
@@ -82,25 +86,21 @@ class Arret:
                     break
         return convert_to_hours_minutes(horaire_compare)
     
-    #méthode pour recuperer la liste des horaires d'un arret
-    # param : name_arret (str)
+    
     
     def horaires_first_path(self):
+        #with this method, we can get the list of timetable from one stop
+        # if there are one stop in two ligns, the we can get the correct line
+        # with the get_ligne() method
         dico = manip_data.regular_horaires(self.get_ligne())  
         horaires = dico[self.get_label()]
         
         return horaires
     
     
-    '''def horaires_sec_path(self):
-        dico = manip_data.regular_horaires(end.get_ligne())  
-        horaires = dico[self.get_label()]
-    
-        
-        return horaires'''
-    
     def get_index_horaire_du_next_arret(self,time):  
-        #liste des horaires de l'arret
+        #return the index of timetable (indicated in parameters) of the new stop in the path
+        # this one is for the first_path() method (shortest way))
         liste_horaires_ar = self.horaires_first_path()
         
         horaire_next_depart = self.next_depart(time)  
@@ -114,8 +114,9 @@ class Arret:
                 break
         return index_depart
     
-    def get_index_horaire_du_next_arret_sec_path(self,time):  
-        #liste des horaires de l'arret
+    def get_index_horaire_du_next_arret_sec_path(self,time):
+        #same than before but this one is for the second path (shortest way)
+     
         liste_horaires_ar = self.horaires_sec_path()
         
         horaire_next_depart = self.next_depart_sec_path(time) 
@@ -129,7 +130,8 @@ class Arret:
                 break
         return index_depart
 
-def construct_arret(ar):
+
+def build_stop(ar): #you can build a stop with this method
     return Arret(ar)
 
 
@@ -137,6 +139,9 @@ def construct_arret(ar):
 #CLASSE LIGNE       
 
 class Ligne:
+    """
+    a line possesses a label same as the Stop class
+    """
     def __init__(self, name_ligne):
         self.name_ligne = name_ligne
     
@@ -164,7 +169,7 @@ class Ligne:
     
         return total
         
-    #parametre : une ligne(str) et un arret(str)
+  
     def get_ligne_back_steps(self,start,end):
         path_back = manip_data.get_path_regular(self.name_ligne)
         path_back.reverse()
@@ -190,11 +195,12 @@ ligne2 = Ligne('2_Piscine-Patinoire_Campus.txt')
 
 #==============================================================================
 #HORAIRES
+
 from datetime import timedelta
- #cette fonction prend en parametre un str du type 'hh:mm'   
+  
 
 def manip_horaire(time):
-    #cette méthode permet de transformer une heure du type HH:MM en nombre de minutes
+    #this method can convert a timetable like HH:MM to a number of minutes
     h = time
     if h != '-':
         delta = timedelta(hours = int(h.split(':')[0]), minutes = int(h.split(':')[1]))
@@ -204,7 +210,8 @@ def manip_horaire(time):
         return True
 
 def convert_to_hours_minutes(number):
-    #cette méthode transforme un nombre de minutes en HH:MM
+    #This is the reverse of the previous method
+    #convert a number of minutes into HH:MM
     hours = number // 60
     number -= (hours * 60)
     minutes = number 
@@ -212,6 +219,7 @@ def convert_to_hours_minutes(number):
 
 
 def get_last_time(liste,timestart):
+    #Give the last timetable of stop list from a start timetable
     for ar in liste:
         
         index_useful = Arret(ar).get_index_horaire_du_next_arret(timestart)
@@ -222,28 +230,19 @@ def get_last_time(liste,timestart):
     return time_done
 
 def get_temps_du_trajet(liste,start,end):  
-    
-    #plus court
-    time_debut_c = start.next_depart(real_time)
-    time_fin_c = get_last_time(liste,timestart)
+    #return the time spent in the bus during the travel
+    #shortes
+    time_debut = start.next_depart(real_time)
+    time_fin= get_last_time(liste,timestart)
   
     
-    minutes_debut_c = manip_horaire(time_debut_c)
-    minutes_fin_c = manip_horaire(time_fin_c)
+    minutes_debut = manip_horaire(time_debut)
+    minutes_fin = manip_horaire(time_fin)
     
-    time_trajet_c = minutes_fin_c - minutes_debut_c
+    time_trajet = minutes_fin - minutes_debut
     
-    '''#plus rapide
-    time_debut_r = start.next_depart(real_time)
-    time_fin_r = get_last_time(trajet_sur_une_ligne(start,end),timestart)
-  
     
-    minutes_debut_r = manip_horaire(time_debut_r)
-    minutes_fin_r = manip_horaire(time_fin_r)
-    
-    time_trajet_r = minutes_fin_r - minutes_debut_r'''
-    
-    return round(time_trajet_c)
+    return round(time_trajet)
 
 
 
@@ -251,7 +250,7 @@ def get_temps_du_trajet(liste,start,end):
 
 
 # ============================================================================
-#   CHEMIN LE PLUS RAPIDE
+#   FASTEST WAY
     
 def trajet_sur_une_ligne(start,end):
   
@@ -291,11 +290,11 @@ def best_time(start,end):
     return time1 if time1 < time2 else time2
 
 
-print(best_time(start,end))
+
 #==============================================================================
-#   CHEMIN LE PLUS COURT
+#   SHORTEST WAY
 def first_path():
-        
+    #in order to switch line     
     dico = manip_data.regular_horaires(start.get_ligne())
     
     chemin = []
@@ -412,8 +411,8 @@ def best_trajet(start,end):#fonction ok
 
 
 #CONSTRUCTION
-start = construct_arret('Arcadium')
-end = construct_arret('Ponchy')
+start = build_stop('Arcadium')
+end = build_stop('Ponchy')
 timestart = '6:24'
 real_time = timestart
 
@@ -436,7 +435,6 @@ print(sec_path())
 print()
 '''
 
-print('time start :', timestart)
 
 plus_court = best_trajet(start,end)
 print('chemin le plus court :')
