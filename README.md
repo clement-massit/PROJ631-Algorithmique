@@ -9,6 +9,8 @@ A project that consists of managing a bus network in order to get the shortest, 
   * 2 classes : 'Arret' and 'Ligne' 
   * Manipulation on timetable
   * For the moment, only shortest and fastest method are up to date
-* manip_data.py : open .txt files which in there are all the timetables of lines
-
+* manip_data.py : open .txt files which in there are all the timetables of lines  
+2 files .txt :
+* 1_Poisy-ParcDesGlaisins : first line
+* 2_Piscine-Patinoire_Campus : second line
  
