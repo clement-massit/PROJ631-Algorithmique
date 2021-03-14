@@ -247,8 +247,13 @@ def get_temps_du_trajet(liste,start,end):
 
 
 #==============================================================================
+
+
+# ============================================================================
+#   FASTEST WAY
+    
 def trajet_sur_une_ligne(start,end):
-  
+    #only one line, if the start stop is on the same line than the final stop
     dico = manip_data.regular_horaires(start.get_ligne())
     chemin = []
     
@@ -260,27 +265,21 @@ def trajet_sur_une_ligne(start,end):
         
     del chemin[0:chemin.index(start.get_label())]     
     return chemin
-
-# ============================================================================
-#   FASTEST WAY
-    
-
     
 def trajets_switchs(start,end):
-  
+    '''
+    allow the bus switches, two stop possible to switch, GARE and VIGNIÈRES
+    so it gives two possible paths
+    this method returns a path or 2 paths
+    '''
+    
     dico = manip_data.regular_horaires(start.get_ligne())
     path = []
     for key in dico.keys():
         path.append(key)
         
     if start.get_ligne() == end.get_ligne(): 
-        chemin = []
-        for key in dico.keys():
-            chemin.append(key)
-         
-            if key == end.get_label():
-                break  
-        del chemin[0:chemin.index(start.get_label())]     
+        chemin = trajet_sur_une_ligne(start,end)     
         return chemin
     else:
         
@@ -301,6 +300,10 @@ def trajets_switchs(start,end):
 
    
 def re_switch(switch,end):
+    '''
+    one switch during the travel
+    it returns only the final steps after switching
+    '''
     trajet = trajet_sur_une_ligne(start,end)
     if trajet[-1] != end.get_label():
         path = []
@@ -319,6 +322,10 @@ def re_switch(switch,end):
 
 
 def possible_times(start,end):
+    '''
+    calculating possible times of travels
+    it returns times in number of minutes
+    '''
     if start.get_ligne() != end.get_ligne():
             
         trajets = trajets_switchs(start,end)
@@ -340,6 +347,11 @@ def possible_times(start,end):
         return time1,time2
 
 def get_trajet_rapide(time,start,end):
+    '''
+    return the travel associated with a number of minutes
+    //link with the preivous method
+    it returns a path and only one path
+    '''
     if start.get_ligne() == end.get_ligne():
         if time == possible_times(start,end)[0]: 
             return trajets_switchs(start,end)
@@ -356,6 +368,12 @@ def get_trajet_rapide(time,start,end):
 
 
 def best_time(start,end):
+    '''
+    now we have all the paths we can calculate the time and return the best time
+    concerning the time travel
+    This method returns the smallest time of travelling 
+    //link with previous methods in order to implement the fastest way method
+    '''
     if start.get_ligne() == end.get_ligne():
         time1 = possible_times(start,end)[0]
         time2 = possible_times(start,end)[1]
@@ -391,13 +409,13 @@ def first_path():
             del chemin[chemin.index(ar)+1:]        
             return chemin 
 
-##changement de ligne
+#switching line
 def sec_path():  
     if first_path()[-1] == end.get_label():
         
         return []
  
-    #1er switch 
+    #1st switch 
     ligne_at_start = start.get_ligne()
    
     if ligne_at_start == ligne1.get_name_ligne():
@@ -424,25 +442,19 @@ def sec_path():
         return chemin
     
    
-    ##reswitch eventuellement
+    ##reswitch 
     if end.get_label() != chemin[-1]:
         if end.get_ligne() == Arret(chemin[-1]).get_ligne():
             ligne_at_start = ligne_at_start
             
         else:
-            ligne_at_start = switch
-            
-            
+            ligne_at_start = switch            
         new_dico = manip_data.regular_horaires(ligne_at_start)
-        
         new_list = []
-        
         
         for key in new_dico.keys():
             new_list.append(key)
-            
-            
-        
+     
         new_index = new_list.index(first_path()[-1])
         fin_index = new_list.index(end.get_label()) 
        
@@ -450,14 +462,15 @@ def sec_path():
         
             if ar == chemin[-1]:
                 new_list = new_list[new_index:fin_index+1]
-                
-                
-        
-           
+          
         return new_list
 
 
 def possible_paths(sart,end):
+    '''
+    like fastes way method, we can enumerate some paths
+    it returns a list of paths
+    '''
     if start.get_ligne() == end.get_ligne():
         trajet = trajet_sur_une_ligne(start,end)
         other =  other = first_path() + sec_path()
@@ -471,7 +484,11 @@ def possible_paths(sart,end):
     
     
     
-def best_trajet(start,end):#fonction ok
+def best_trajet(start,end):
+    '''
+    now we want the best travel concerning the number of stop
+    this method returns the shortest way it terms of lenght of list
+    '''
     if start.get_ligne() == end.get_ligne():
         paths = possible_paths(start,end)
         return paths[0] if len(paths[0]) < len(paths[1]) else paths[1] 
