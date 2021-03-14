@@ -247,11 +247,6 @@ def get_temps_du_trajet(liste,start,end):
 
 
 #==============================================================================
-
-
-# ============================================================================
-#   FASTEST WAY
-    
 def trajet_sur_une_ligne(start,end):
   
     dico = manip_data.regular_horaires(start.get_ligne())
@@ -266,28 +261,110 @@ def trajet_sur_une_ligne(start,end):
     del chemin[0:chemin.index(start.get_label())]     
     return chemin
 
+# ============================================================================
+#   FASTEST WAY
+    
 
+    
+def trajets_switchs(start,end):
+  
+    dico = manip_data.regular_horaires(start.get_ligne())
+    path = []
+    for key in dico.keys():
+        path.append(key)
+        
+    if start.get_ligne() == end.get_ligne(): 
+        chemin = []
+        for key in dico.keys():
+            chemin.append(key)
+         
+            if key == end.get_label():
+                break  
+        del chemin[0:chemin.index(start.get_label())]     
+        return chemin
+    else:
+        
+        switch = 'GARE'
+        trajet_switched = re_switch(switch,end)
+        trajet = path[path.index(start.get_label()):path.index(switch)+1]
+        final = trajet + trajet_switched
+        
+    
+        switch = 'VIGNIÈRES'
+        total = []
+        trajet_switched = re_switch(switch,end)
+        trajet = path[path.index(start.get_label()):path.index(switch)+1]
+        total = trajet + trajet_switched
+        
+        return final,total
+ 
 
+   
+def re_switch(switch,end):
+    trajet = trajet_sur_une_ligne(start,end)
+    if trajet[-1] != end.get_label():
+        path = []
+        dico = manip_data.regular_horaires(end.get_ligne())
+        for key in dico.keys():
+            path.append(key)
+            
+        if switch == 'GARE':
+
+            del path[0:trajet.index(switch)+1]
+        else:
+            
+            del path[0:path.index(switch)]
+        return path
+    
 
 
 def possible_times(start,end):
-    trajet = trajet_sur_une_ligne(start,end)
-    other = first_path() + sec_path()
-    
-    time1 = get_temps_du_trajet(trajet,start,end)
-    time2 = get_temps_du_trajet(other,start,end)
-    
-    return time1,time2
+    if start.get_ligne() != end.get_ligne():
+            
+        trajets = trajets_switchs(start,end)
+       
+        other = first_path() + sec_path()
+        
+        time1 = get_temps_du_trajet(trajets[0],start,end)
+        time2 = get_temps_du_trajet(trajets[1],start,end)
+        time3 = get_temps_du_trajet(other,start,end)
+        
+        return time1,time2,time3
+    else:
+        trajet = trajet_sur_une_ligne(start,end)
+        other = first_path() + sec_path()
+        
+        time1 = get_temps_du_trajet(trajet,start,end)
+        time2 = get_temps_du_trajet(other,start,end)
+        
+        return time1,time2
 
 def get_trajet_rapide(time,start,end):
-    return trajet_sur_une_ligne(start,end) if time == possible_times(start,end)[0] else first_path() + sec_path()
+    if start.get_ligne() == end.get_ligne():
+        if time == possible_times(start,end)[0]: 
+            return trajets_switchs(start,end)
+        else:
+            return first_path() + sec_path()
+    else:
+        if time == possible_times(start,end)[0]:
+            return trajets_switchs(start,end)[0]
+        if time == possible_times(start,end)[1]:
+            return trajets_switchs(start,end)[1]
+        else:
+            return first_path() + sec_path()
 
 
 
 def best_time(start,end):
-    time1 = possible_times(start,end)[0]
-    time2 = possible_times(start,end)[1]
-    return time1 if time1 < time2 else time2
+    if start.get_ligne() == end.get_ligne():
+        time1 = possible_times(start,end)[0]
+        time2 = possible_times(start,end)[1]
+        return min(time1,time2)
+    else:
+        time1 = possible_times(start,end)[0]
+        time2 = possible_times(start,end)[1]
+        time3 = possible_times(start,end)[2]
+        return min(time1,time2,time3)
 
 
 
@@ -313,7 +390,6 @@ def first_path():
         if ligne1.existe_dans_ligne(ar) == True and ligne2.existe_dans_ligne(ar) == True: 
             del chemin[chemin.index(ar)+1:]        
             return chemin 
-
 
 ##changement de ligne
 def sec_path():  
@@ -373,9 +449,6 @@ def sec_path():
         for ar in new_list:
         
             if ar == chemin[-1]:
-                #print('new_liste quon doit del',new_list,'\n')
-                #del new_list[0:new_index]
-                #print('\nee', new_list,'\n')
                 new_list = new_list[new_index:fin_index+1]
                 
                 
@@ -385,28 +458,33 @@ def sec_path():
 
 
 def possible_paths(sart,end):
-    trajet = trajet_sur_une_ligne(start,end)
-   
-    other = first_path() + sec_path()
-   
-    result = []
-    for ar in other:
-        if ar not in result:
-            result.append(ar)
-    
-    return trajet,result
+    if start.get_ligne() == end.get_ligne():
+        trajet = trajet_sur_une_ligne(start,end)
+        other =  other = first_path() + sec_path()
+        
+        return trajet, other
+    else:
+        trajets = trajets_switchs(start,end)
+        other = first_path() + sec_path()
+        
+        return trajets[0],trajets[1],other
     
     
     
 def best_trajet(start,end):#fonction ok
-    paths = possible_paths(start,end)
-    
-    if len(paths[0]) < len(paths[1]):
-        return paths[0]
+    if start.get_ligne() == end.get_ligne():
+        paths = possible_paths(start,end)
+        return paths[0] if len(paths[0]) < len(paths[1]) else paths[1] 
     else:
-        return paths[1]
+        paths = possible_paths(start,end)
+        if len(paths[0]) < len(paths[1]) and len(paths[0]) < len(paths[2]):
+            return paths[0]
+        if len(paths[1]) < len(paths[0]) and len(paths[1]) < len(paths[2]):
+            return paths[1]
+        else:
+            return paths[2]
 
-   
+
 #==============================================================================   
 
 
@@ -414,8 +492,8 @@ def best_trajet(start,end):#fonction ok
 
 start = build_stop('Parc_des_Sports')
 
-end = build_stop('CAMPUS')
-timestart = '16:32'
+end = build_stop('VIGNIÈRES')
+timestart = '6:00'
 real_time = timestart
 
 
