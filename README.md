@@ -1,7 +1,7 @@
 # PROJ631 - ALGORITHMIQUE 
 
 ## Managing a bus network
-A project that consists of managing a bus network in order to get the shortest, fastest and foremost way between two points.        
+A project that consists of managing a bus network in order to get the shortest, fastest and foremost way between two points. Points are represented by stop.      
 
 ### DETAILS  
 3 files .py :
