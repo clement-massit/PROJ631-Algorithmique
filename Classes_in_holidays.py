@@ -513,7 +513,7 @@ def foremost(start,end):
 #CONSTRUCTION
 
 def build_test(start,end,timestart):
-    print(' *** horaires de vacances *** ') 
+    print(' ***  holiday timetables *** ') 
     plus_court = best_trajet(start,end)
     print('\n chemin le plus court :\n')
     for i in plus_court:
@@ -535,7 +535,7 @@ def build_test(start,end,timestart):
     
     
     plus_tot = foremost(start,end)[0]
-    print('\n chemin arrivant le plus tot :\n')
+    print('chemin arrivant le plus tot :\n')
     for i in plus_tot:
         print('\t-', i)
     print()
@@ -557,7 +557,6 @@ def main():
     timestart = '6:00'
     realtime = timestart
     
-  
     print(build_test(start,end,timestart))
     
     

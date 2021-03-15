@@ -535,7 +535,7 @@ def build_test(start,end,timestart):
     
     
     plus_tot = foremost(start,end)[0]
-    print('\n chemin arrivant le plus tot :\n')
+    print('chemin arrivant le plus tot :\n')
     for i in plus_tot:
         print('\t-', i)
     print()
@@ -554,7 +554,7 @@ def main():
     timestart = input()'''
     start = build_stop('Parc_des_Sports')
     end = build_stop('VIGNIÈRES')
-    timestart = '6:00'
+    timestart = '15:44'
     realtime = timestart
     
   
