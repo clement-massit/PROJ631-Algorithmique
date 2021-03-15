@@ -1,12 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Mar 14 14:12:14 2021
-
-@author: cleme
-"""
-
-# -*- coding: utf-8 -*-
-"""
 Éditeur de Spyder
 
 Ceci est un script temporaire.
@@ -167,47 +160,14 @@ class Ligne:
     def get_name_ligne(self):
         return self.name_ligne  #returns str    
     
-    def get_ligne_go_steps(self,start,end):
-        '''
-        path_go = manip_data.get_path_regular(self.name_ligne)
-        
-        index_start = path_go.index(Arret.get_label(start))
-        index_end = path_go.index(Arret.get_label(end))
-        
-        end_path = path_go.copy()
-        end_path = path_go[index_start:index_end+1]
-        '''
-        
-        first = first_path()
-        last = sec_path()
-
-        total = first + last
-    
-        return total
-        
-  
-    def get_ligne_back_steps(self,start,end):
-        path_back = manip_data.get_path_regular(self.name_ligne)
-        path_back.reverse()
-      
-        index_start = path_back.index(Arret.get_label(start))
-        index_end = path_back.index(Arret.get_label(end))
-        
-        end_path = path_back.copy()
-        end_path = path_back[index_start:index_end+1]
-        
-        return end_path
-    
     def existe_dans_ligne(self,arret):
         for arr in manip_data.get_path_regular(self.get_name_ligne()):
             
             if arret == arr:
                 return True
         
-              
 ligne1 = Ligne('1_Poisy-ParcDesGlaisins.txt')
 ligne2 = Ligne('2_Piscine-Patinoire_Campus.txt')
-
 
 #==============================================================================
 #HORAIRES
@@ -261,12 +221,7 @@ def get_temps_du_trajet(liste,start,end):
     
     return round(time_trajet)
 
-
-
-#==============================================================================
-
-
-# ============================================================================
+# =============================================================================
 #   FASTEST WAY
     
 def trajet_sur_une_ligne(start,end):
@@ -521,13 +476,44 @@ def best_trajet(start,end):
 
 
 #==============================================================================   
-
-
+# FOREMOST WAY
+def foremost(start,end):
+    '''
+    the foremost path implements the way that arrive the earliest.
+    It takes some previous methods in order to list the paths.
+    '''
+    if start.get_ligne() == end.get_ligne():
+        trajet = possible_paths(start,end)
+        
+        first, sec = trajet[0], trajet[1]
+        time_first = manip_horaire(get_last_time(first,timestart))
+        time_sec = manip_horaire(get_last_time(sec,timestart))
+        mini = min(time_first, time_sec)
+        if mini == time_first:
+            return first, time_first
+        else:
+            return sec, time_sec
+    else:
+        
+        trajet = possible_paths(start,end)
+        one,two,three = trajet[0], trajet[1], trajet[2]
+        time_one = manip_horaire(get_last_time(one,timestart))
+        time_two = manip_horaire(get_last_time(two,timestart))
+        time_three = manip_horaire(get_last_time(three,timestart))
+        mini = min(time_one, time_two, time_three)
+        
+        if mini == time_one:
+            return one, time_one
+        if mini == time_two:
+            return two, time_two
+        else:
+            return three, time_three   
+        
+#==============================================================================            
 #CONSTRUCTION
 
-
 def build_test(start,end,timestart):
-        
+    print(' *** horaires de vacances *** ') 
     plus_court = best_trajet(start,end)
     print('\n chemin le plus court :\n')
     for i in plus_court:
@@ -546,17 +532,29 @@ def build_test(start,end,timestart):
     time_trajet_rapide = get_temps_du_trajet(plus_rapide,start,end)
     print('time travel :', time_trajet_rapide, 'minutes') 
     print('\n------------------\n')
+    
+    
+    plus_tot = foremost(start,end)[0]
+    print('\n chemin arrivant le plus tot :\n')
+    for i in plus_tot:
+        print('\t-', i)
+    print()
+    time_trajet_tot = get_temps_du_trajet(plus_tot,start,end)
+    print('time travel :', time_trajet_tot, 'minutes\n') 
     return 'done'
 
 
 def main():
     global start, end, timestart,realtime
-    print('\n\t ENTER A START STOP :')
+    '''print('\n\t ENTER A START STOP :')
     start = build_stop(input())
     print('\t ENTER A FINAL STOP :')
     end = build_stop(input())
     print('\t ENTER A START TIMETABLE :')
-    timestart = input()
+    timestart = input()'''
+    start = build_stop('Parc_des_Sports')
+    end = build_stop('VIGNIÈRES')
+    timestart = '6:00'
     realtime = timestart
     
   
