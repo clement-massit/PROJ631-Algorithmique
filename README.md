@@ -11,7 +11,7 @@ A project that consists of managing a bus network in order to get the shortest, 
 * Classes_in_holidays.py :  
    * algorithms with holiday timetables
  
-* manip_data.py : open .txt files which in there are all the timetables of lines  
+* manip_data.py : open .txt files which in there are all the timetables of lines and choose if you want to travel on go or back lines. 
 
 2 files .txt :
 * '1_Poisy-ParcDesGlaisins' : first line
