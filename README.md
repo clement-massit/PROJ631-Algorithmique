@@ -23,7 +23,7 @@ these two txt are the table of all timetable that every stop has.
  
 ### How to launch
 You can launch one of the Classes_in_regular.py or CLasses_in_holidays.py if you want to run it on holidays time or regular time.  
-
+You can type in your command prompt : python Classes_in_regular.py in order to launch the algorithm.
 
 
 --------------------------------------------------------------------------------------
