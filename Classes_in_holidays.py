@@ -546,15 +546,15 @@ def build_test(start,end,timestart):
 
 def main():
     global start, end, timestart,realtime
-    '''print('\n\t ENTER A START STOP :')
+    print('\n\t ENTER A START STOP :')
     start = build_stop(input())
     print('\t ENTER A FINAL STOP :')
     end = build_stop(input())
     print('\t ENTER A START TIMETABLE :')
-    timestart = input()'''
-    start = build_stop('Parc_des_Sports')
+    timestart = input()
+    '''start = build_stop('Parc_des_Sports')
     end = build_stop('VIGNIÈRES')
-    timestart = '6:00'
+    timestart = '6:00' '''
     realtime = timestart
     
     print(build_test(start,end,timestart))

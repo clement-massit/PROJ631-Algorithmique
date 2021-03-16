@@ -249,15 +249,19 @@ def trajets_switchs(start,end):
     path = []
     for key in dico.keys():
         path.append(key)
-        
-    if start.get_ligne() == end.get_ligne(): 
+    ligne_end = end.get_ligne()   
+    
+    if start.get_ligne() == end.get_ligne() and Ligne(ligne_end).existe_dans_ligne(end.get_label()) == True: 
         chemin = trajet_sur_une_ligne(start,end)     
+        
         return chemin
     else:
         
         switch = 'GARE'
         trajet_switched = re_switch(switch,end)
+        
         trajet = path[path.index(start.get_label()):path.index(switch)+1]
+       
         final = trajet + trajet_switched
         
     
@@ -268,28 +272,32 @@ def trajets_switchs(start,end):
         total = trajet + trajet_switched
         
         return final,total
- 
+     
 
-   
+  
 def re_switch(switch,end):
     '''
     one switch during the travel
     it returns only the final steps after switching
     '''
     trajet = trajet_sur_une_ligne(start,end)
+   
     if trajet[-1] != end.get_label():
+        
         path = []
         dico = manip_data.regular_horaires(end.get_ligne())
         for key in dico.keys():
             path.append(key)
-            
+        
         if switch == 'GARE':
-
+            
             del path[0:trajet.index(switch)+1]
         else:
-            
+           
             del path[0:path.index(switch)]
         return path
+    else:
+        return trajet
     
 
 
@@ -515,7 +523,7 @@ def foremost(start,end):
 def build_test(start,end,timestart):
     print(' *** regular timetables *** ')
     plus_court = best_trajet(start,end)
-    print('\n chemin le plus court :\n')
+    print('\nShortest Way :\n')
     for i in plus_court:
         print('\t-',i)
     print()    
@@ -525,7 +533,7 @@ def build_test(start,end,timestart):
     
     print('\n------------------\n')
     plus_rapide = get_trajet_rapide(best_time(start,end), start,end)
-    print('chemin le plus rapide :\n')
+    print('Fastest Way :\n')
     for i in plus_rapide:
         print('\t-',i)
     print()    
@@ -535,7 +543,7 @@ def build_test(start,end,timestart):
     
     
     plus_tot = foremost(start,end)[0]
-    print('chemin arrivant le plus tot :\n')
+    print('Foremost Way :\n')
     for i in plus_tot:
         print('\t-', i)
     print()
@@ -546,15 +554,15 @@ def build_test(start,end,timestart):
 
 def main():
     global start, end, timestart,realtime
-    '''print('\n\t ENTER A START STOP :')
+    print('\n\t ENTER A START STOP :')
     start = build_stop(input())
     print('\t ENTER A FINAL STOP :')
     end = build_stop(input())
     print('\t ENTER A START TIMETABLE :')
-    timestart = input()'''
-    start = build_stop('Parc_des_Sports')
+    timestart = input()
+    '''start = build_stop('Parc_des_Sports')
     end = build_stop('VIGNIÈRES')
-    timestart = '15:44'
+    timestart = '8:50' '''
     realtime = timestart
     
   
